@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% block title %}Submit structure{% endblock title %}
+{% block epilogue %}
+{{ super() }}
+<script>
+$(function(){
+    $("#chain-selector > button").click(function() {
+        console.log(this);
+    });
+});
+</script>
+{% endblock epilogue %}
+{% block content %}
+<h1>Submit structure</h1>
+<form>
+    <div class="form-group row">
+        <label for="structure-file" class="col-sm-2 col-form-label">Structure</label>
+        <div class="col-sm-10">
+            <label class="custom-file">
+                <input type="file" class="custom-file-input"
+                    id="structure-file">
+                <span class="custom-file-control"></span>
+            </label>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label for="dropdownMenuButton" class="col-sm-2 col-form-label">Chain</label>
+        <div class="col-sm-10">
+            <input id="chain-id" value="" type="hidden">
+            <div class="dropdown">
+                <button class="btn dropdown-toggle" type="button"
+                    id="dropdownMenuButton" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">Dropdown
+                    button</button>
+                <div id="chain-selector" class="dropdown-menu"
+                    aria-labelledby="dropdownMenuButton">
+                    <button class="dropdown-item">A</button>
+                    <button class="dropdown-item">B</button>
+                    <button class="dropdown-item">C</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="offset-sm-2 col-sm-10">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </div>
+    </div>
+</form>
+{% endblock content %}

@@ -1,0 +1,32 @@
+{% extends "base.html" %} {% block title %}Results of {{ job_id }}{% endblock title %}
+{% block head %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='results.bundle.js') }}"></script>
+    <script>
+    const endpoint_url = "{{ url_for('phyrestorm.results_data', job_id=job_id) }}";
+    window.init_results(endpoint_url);
+    </script>
+{% endblock head %}
+{% block content %}
+<h1>Results</h1>
+
+<table class="table">
+<tr>
+    <th>Superposition</th>
+    <th>Name</th>
+    <th>TM-score (query)</th>
+    <th>TM-score (hit)</th>
+    <th>Alignment</th>
+</tr>
+{% for hit in results %}
+<tr>
+    <td><img src="{{ hit.super_img }}"></td>
+    <td>{{ hit.name }}</td>
+    <td>{{ hit.tm1 }}</td>
+    <td>{{ hit.tm2 }}</td>
+    <td><!--<img src="{{ hit.aln_img }}">--></td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock content %}
