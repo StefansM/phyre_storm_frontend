@@ -1,32 +1,55 @@
 {% extends "base.html" %} {% block title %}Results of {{ job_id }}{% endblock title %}
-{% block head %}
+{% block footer %}
     {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='results.css') }}">
     <script src="{{ url_for('static', filename='results.bundle.js') }}"></script>
     <script>
-    const endpoint_url = "{{ url_for('phyrestorm.results_data', job_id=job_id) }}";
-    window.init_results(endpoint_url);
+    const results_params = {
+        endpoint_url: "{{ url_for('phyrestorm.results_data', job_id=job_id) }}",
+        page_size: {{ page_size }},
+        num_alignments: {{ num_alignments }},
+        element: "#grid",
+    };
+    $(function() {
+        PhyreStorm.init_grid(results_params);
+    });
     </script>
-{% endblock head %}
+{% endblock footer %}
 {% block content %}
 <h1>Results</h1>
 
-<table class="table">
-<tr>
-    <th>Superposition</th>
-    <th>Name</th>
-    <th>TM-score (query)</th>
-    <th>TM-score (hit)</th>
-    <th>Alignment</th>
-</tr>
-{% for hit in results %}
-<tr>
-    <td><img src="{{ hit.super_img }}"></td>
-    <td>{{ hit.name }}</td>
-    <td>{{ hit.tm1 }}</td>
-    <td>{{ hit.tm2 }}</td>
-    <td><!--<img src="{{ hit.aln_img }}">--></td>
-</tr>
-{% endfor %}
-</table>
+<div class="row">
+    <div class="col col-10">
+        <div id="load-bar" class="progress">
+          <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+    </div>
+    <div class="col-2">
+        <button class="btn" id="download-all">
+            <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
+        </button>
+    </div>
+</div>
+
+<div id="grid" style="min-height: 20em">
+    <table class="table">
+    <tr>
+        <th>Superposition</th>
+        <th>Name</th>
+        <th>TM-score (query)</th>
+        <th>TM-score (hit)</th>
+        <th>Alignment</th>
+    </tr>
+    {% for hit in results %}
+    <tr>
+        <td><img src="{{ hit.super_img }}"></td>
+        <td>{{ hit.name }}</td>
+        <td>{{ hit.tm1 }}</td>
+        <td>{{ hit.tm2 }}</td>
+        <td><img src="{{ hit.aln_img }}"></td>
+    </tr>
+    {% endfor %}
+    </table>
+</div>
 
 {% endblock content %}

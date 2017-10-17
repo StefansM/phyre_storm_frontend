@@ -1,40 +1,51 @@
-const path = require('path')
+const path = require('path');
 const webpack = require('webpack');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const merge = require('webpack-merge');
 
-module.exports = {
-    entry: {
-        results: './js/results.js',
-        app: './js/app.js'
+const parts = require('./webpack.parts.js');
+
+const PATHS = {
+    js: path.join(__dirname, 'js'),
+    build: path.join(__dirname, 'static'),
+};
+
+const common_config = merge([
+    {
+        output: {
+            path: PATHS.build,
+            filename: '[name].bundle.js',
+            library: 'PhyreStorm',
+            libraryTarget: 'var',
+        },
+        entry: {
+            results: './js/results.js',
+        },
+        externals: {
+            jquery: "jQuery",
+        }
     },
-    output: {
-        path: path.resolve(__dirname + '/static'),
-        filename: "[name].bundle.js"
-    },
-    module: {
-        rules: [{
-            test: /\.js$/,
-            exclude: /(node_modules|bower_components)/,
-            use: {
-                loader: 'babel-loader',
-                options: {
-                    presets: ['env']
-                }
-            }
-        }, {
-            test: /\.css$/,
-            use: ExtractTextPlugin.extract({
-                fallback: "style-loader",
-                use: "css-loader"
-            })
-        }]
-    },
-    plugins: [new ExtractTextPlugin("styles.css"), new webpack.ProvidePlugin({
-        $: 'jquery',
-        jQuery: 'jquery',
-        'window.jQuery': 'jquery',
-        Popper: ['popper.js', 'default'],
-    }), new webpack.optimize.CommonsChunkPlugin({
-        name: 'common' // Bundle containing common code
-    })]
+    parts.load_javascript({ include: PATHS.js }),
+    //parts.provide(),
+]);
+
+const production_config = merge([
+    parts.extract_css({ use: ['css-loader'] }),
+    parts.extract_bundles([{ name: 'common' }]),
+]);
+
+const development_config = merge([
+    parts.source_maps({ type: 'source-map' }),
+    parts.load_images({
+        options: {
+          limit: 15000,
+          name: '[name].[hash:8].[ext]',
+        },
+    }),
+    parts.extract_css({ use: ['css-loader'] }),
+    parts.extract_bundles([{ name: 'common' }]),
+]);
+
+module.exports = (env) => {
+    const config = env === 'production' ? production_config : development_config;
+    return merge([common_config, config]);
 };

@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently --kill-others 'FLASK_DEBUG=1 FLASK_APP=app.py flask run' 'webpack --watch --env development'",
     "build": "webpack",
     "start": "python app.py"
   },
@@ -14,15 +15,16 @@
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.0",
+    "concurrently": "^3.5.0",
     "css-loader": "^0.28.7",
     "extract-text-webpack-plugin": "^3.0.1",
     "style-loader": "^0.19.0",
-    "webpack": "^3.7.1"
+    "url-loader": "^0.6.2",
+    "webpack": "^3.7.1",
+    "webpack-dev-server": "^2.9.2",
+    "webpack-merge": "^4.1.0"
   },
   "dependencies": {
-    "bootstrap": "^4.0.0-beta",
-    "jquery": "^3.2.1",
-    "popper.js": "^1.12.5",
     "slickgrid": "^2.3.3"
   }
 }

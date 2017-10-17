@@ -7,3 +7,4 @@ htmlcov
 venv
 *.bundle.js
 /node_modules/*
+/static/*
