@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "concurrently --kill-others 'FLASK_DEBUG=1 FLASK_APP=app.py flask run' 'webpack --watch --env development'",
     "build": "webpack",
-    "start": "python app.py"
+    "start": "python app.py",
+    "lint:js": "eslint js/ webpack.*.js --cache"
   },
   "author": "",
   "license": "",
@@ -17,6 +18,9 @@
     "babel-preset-env": "^1.6.0",
     "concurrently": "^3.5.0",
     "css-loader": "^0.28.7",
+    "eslint": "^4.9.0",
+    "eslint-loader": "^1.9.0",
+    "eslint-plugin-import": "^2.7.0",
     "extract-text-webpack-plugin": "^3.0.1",
     "style-loader": "^0.19.0",
     "url-loader": "^0.6.2",
@@ -25,6 +29,8 @@
     "webpack-merge": "^4.1.0"
   },
   "dependencies": {
-    "slickgrid": "^2.3.3"
+    "eslint-config-airbnb-base": "^12.1.0",
+    "slickgrid": "^2.3.3",
+    "url-polyfill": "^1.0.8"
   }
 }

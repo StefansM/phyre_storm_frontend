@@ -2,42 +2,43 @@ const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 exports.extract_css = ({ include, exclude, use }) => {
-    // Write extracted CSS to a file
-    const plugin = new ExtractTextPlugin({ filename: '[name].css' });
-    return {
-        module: {
-            rules: [{
-                test: /\.css$/,
-                include, exclude,
-                use: plugin.extract({
-                    use,
-                    fallback: "style-loader",
-                })
-            }]
-        },
-        plugins: [ plugin ],
-    };
+  // Write extracted CSS to a file
+  const plugin = new ExtractTextPlugin({ filename: '[name].css' });
+  return {
+    module: {
+      rules: [{
+        test: /\.css$/,
+        include,
+        exclude,
+        use: plugin.extract({
+          use,
+          fallback: 'style-loader',
+        }),
+      }],
+    },
+    plugins: [plugin],
+  };
 };
 
-exports.extract_bundles = (bundles) => ({
-  plugins: bundles.map((bundle) => (
+exports.extract_bundles = bundles => ({
+  plugins: bundles.map(bundle => (
     new webpack.optimize.CommonsChunkPlugin(bundle)
   )),
 });
 
 exports.load_javascript = ({ include, exclude }) => ({
-    module: {
-        rules: [{
-            test: /\.js$/,
-            exclude: /(node_modules|bower_components)/,
-            use: {
-                loader: 'babel-loader',
-                options: {
-                    presets: ['env']
-                }
-            }
-        }]
-    }
+  module: {
+    rules: [{
+      test: /\.js$/,
+      exclude: /(node_modules|bower_components)/,
+      use: {
+        loader: 'babel-loader',
+        options: {
+          presets: ['env'],
+        },
+      },
+    }],
+  },
 });
 
 exports.dev_server = ({ host, port } = {}) => ({
@@ -69,33 +70,48 @@ exports.load_css = ({ include, exclude } = {}) => ({
 });
 
 exports.provide = () => ({
-    plugins: [
-        new webpack.ProvidePlugin({
-            $: 'jquery',
-            jQuery: 'jquery',
-            'window.jQuery': 'jquery',
-            Popper: ['popper.js', 'default'],
-        })
-    ]
+  plugins: [
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery',
+      'window.jQuery': 'jquery',
+      Popper: ['popper.js', 'default'],
+    }),
+  ],
 });
 
 exports.load_images = ({ include, exclude, options } = {}) => ({
-    module: {
-      rules: [
-        {
-          test: /\.(png|jpg|svg|gif)$/,
-          include,
-          exclude,
+  module: {
+    rules: [
+      {
+        test: /\.(png|jpg|svg|gif)$/,
+        include,
+        exclude,
 
-          use: {
-            loader: 'url-loader',
-            options,
-          },
+        use: {
+          loader: 'url-loader',
+          options,
         },
-      ],
-    },
-  });
+      },
+    ],
+  },
+});
 
 exports.source_maps = ({ type }) => ({
   devtool: type,
+});
+
+exports.eslint = () => ({
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        enforce: 'pre',
+        loader: 'eslint-loader',
+        options: {
+          emitWarning: true,
+        },
+      },
+    ],
+  },
 });

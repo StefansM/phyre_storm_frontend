@@ -1,0 +1,13 @@
+{
+  "env": {
+    "browser": true
+  },
+  "settings": {
+    "import/core-modules": ["jquery"]
+  },
+  "extends": "airbnb-base",
+  "rules": {
+    "no-plusplus": "off",
+    "camelcase": "off"
+  }
+}
