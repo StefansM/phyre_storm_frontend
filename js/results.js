@@ -18,7 +18,9 @@ class RemoteLoader {
     this.on_data_loaded = new Slick.Event();
     this.last_result = null;
 
-    this.group_meta_provider = new Slick.Data.GroupItemMetadataProvider();
+    this.group_meta_provider = new Slick.Data.GroupItemMetadataProvider({
+      groupFormatter: group_cell_formatter
+    });
     this.data_view = new Slick.Data.DataView({
       groupItemMetadataProvider: this.group_meta_provider,
       inlineFilters: true,
@@ -156,30 +158,64 @@ function init_grouping(data_view) {
   });
 }
 
+function group_cell_formatter(row, cell, value, columnDef, item) {
+  var indentation = item.level * 15;
+
+  let state_cls = item.collapsed ? "collapsed" : "expanded";
+  let loading_cls = "fa fa-circle-o-notch fa-spin";
+  let new_elem = `<span class="slick-group-toggle ${state_cls}" `
+    + `style="margin-left: ${indentation}px"></span>`
+    + (item.loading ? `<span class="${loading_cls}"></span>` : "")
+    + `<span class="slick-group-title" level="${item.level}">`
+    + item.title + "</span>";
+
+  return new_elem;
+}
+
+
+
 
 export function init_grid(params) {
   loader = new RemoteLoader(params.endpoint_url, params.num_alignments);
   grid = new Slick.Grid(params.element, loader.data_view, slick_columns, slick_options);
   grid.setSelectionModel(new Slick.CellSelectionModel());
-  grid.registerPlugin(loader.group_meta_provider);
-  grid.onSort.subscribe((e, args) => {
-    console.log(e);
+
+  grid.onClick.subscribe((e, args) => {
+    let item = grid.getDataItem(args.row);
+    if (item && item instanceof Slick.Group && item.collapsed) {
+      if (item.count == 4) {
+        // We are expanding a group with zero items. Add the "loading" property
+        // to the item and start a request for more data.
+        item.loading = true;
+        grid.invalidateRow(args.row);
+        grid.render();
+        e.stopImmediatePropagation();
+        e.preventDefault();
+
+        loader.load_results().then((data) => {
+          item.loading = false;
+          grid.getData().expandGroup(item.groupingKey);
+
+          grid.invalidateRow(args.row);
+          grid.render();
+        });
+      }
+    }
   });
 
+  grid.registerPlugin(loader.group_meta_provider);
+
   loader.data_view.onRowCountChanged.subscribe((e, args) => {
-    console.log("Row count changed.");
     grid.updateRowCount();
     grid.render();
   });
   loader.data_view.onRowsChanged.subscribe((e, args) => {
-    console.log("Rows changed.");
     grid.invalidateRows(args.rows);
     grid.render();
   });
   init_grouping(loader.data_view);
 
   loader.on_data_loaded.subscribe((event) => {
-    console.log("Data loaded.");
     loader.data_view.getGroups().sort(comparer);
     grid.updateRowCount();
     grid.render();
